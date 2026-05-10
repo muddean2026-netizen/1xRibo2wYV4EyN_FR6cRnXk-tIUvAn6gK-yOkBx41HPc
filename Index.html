@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสายสิริ (Sai-Siri) - บันทึกเวลาสาย</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Kanit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .navbar {
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px 30px;
+      margin-bottom: 30px;
+      border-radius: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .navbar-brand img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    .navbar-brand h1 {
+      color: #7c3aed;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .navbar-brand p {
+      color: #9333ea;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .navbar-menu {
+      display: flex;
+      gap: 10px;
+    }
+
+    .navbar-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Kanit';
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-btn-secondary {
+      background: #f3e8ff;
+      color: #7c3aed;
+      border: 2px solid #7c3aed;
+    }
+
+    .navbar-btn-secondary:hover {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .navbar-btn-logout {
+      background: #fecaca;
+      color: #991b1b;
+    }
+
+    .navbar-btn-logout:hover {
+      background: #fca5a5;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .card-title {
+      color: #7c3aed;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .card-description {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: 'Kanit';
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f3e8ff;
+      color: #7c3aed;
+      border: 2px solid #7c3aed;
+    }
+
+    .btn-secondary:hover {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #1f2937;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-family: 'Kanit';
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #f3e8ff;
+      padding-bottom: 15px;
+    }
+
+    .modal-header h2 {
+      color: #7c3aed;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .close {
+      color: #9ca3af;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close:hover {
+      color: #7c3aed;
+    }
+
+    .success-message {
+      background: #dcfce7;
+      color: #166534;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #16a34a;
+    }
+
+    .error-message {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 15px 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #dc2626;
+    }
+
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .file-upload input {
+      display: none;
+    }
+
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      border: 2px dashed #7c3aed;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #f8f5ff;
+      transition: all 0.3s ease;
+      gap: 10px;
+    }
+
+    .file-upload-label:hover {
+      background: #f3e8ff;
+      border-color: #a78bfa;
+    }
+
+    .file-preview {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .file-preview img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      border-radius: 10px 10px 0 0;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-primary {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .summary-card {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .summary-item {
+      background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #7c3aed;
+      text-align: center;
+    }
+
+    .summary-item-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+
+    .summary-item-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+    }
+
+    .filter-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Kanit';
+      font-weight: 600;
+      color: #9ca3af;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      color: #7c3aed;
+      border-bottom-color: #7c3aed;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      border: 4px solid #f3e8ff;
+      border-top: 4px solid #7c3aed;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Kanit';
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-edit {
+      background: #dbeafe;
+      color: #0c4a6e;
+    }
+
+    .btn-edit:hover {
+      background: #0c4a6e;
+      color: white;
+    }
+
+    .btn-delete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn-delete:hover {
+      background: #991b1b;
+      color: white;
+    }
+
+    .admin-panel {
+      background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border-left: 4px solid #f59e0b;
+    }
+
+    .admin-panel h3 {
+      color: #92400e;
+      margin-bottom: 15px;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .btn-export {
+      padding: 10px 20px;
+      background: white;
+      color: #7c3aed;
+      border: 2px solid #7c3aed;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Kanit';
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-export:hover {
+      background: #7c3aed;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .navbar-brand h1 {
+        font-size: 18px;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 20% auto;
+      }
+
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .filter-group {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="navbar-brand">
+      <img src="https://www.bansapanhak.com/_files_school/90101900/data/90101900_0_20250718-062751.png" alt="Logo">
+      <div>
+        <h1>ระบบสายสิริ (Sai-Siri)</h1>
+        <p>ระบบบันทึกเวลาสายของโรงเรียนบ้านสะพานหัก</p>
+      </div>
+    </div>
+    <div class="navbar-menu">
+      <button class="navbar-btn navbar-btn-secondary" onclick="showAdminLogin()">🔐 Admin</button>
+      <button class="navbar-btn navbar-btn-logout" onclick="logout()" id="logoutBtn" style="display:none">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Main Cards -->
+    <div class="main-content" id="mainContent">
+      <!-- Card 1: บันทึกการมาสาย -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">📝</div>
+          <h3 class="card-title">บันทึกการมาสาย</h3>
+        </div>
+        <p class="card-description">บันทึกข้อมูลนักเรียนที่มาสายพร้อมแนบรูปภาพหลักฐาน</p>
+        <button class="btn btn-primary" onclick="openAttendanceModal()">📋 เริ่มบันทึก</button>
+      </div>
+
+      <!-- Card 2: ดูรายงานรายวัน -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">📊</div>
+          <h3 class="card-title">ดูรายงานรายวัน</h3>
+        </div>
+        <p class="card-description">ดูรายงานสรุปการมาสายแยกตามวันที่และชั้นเรียน</p>
+        <button class="btn btn-primary" onclick="openDailyReportModal()">📈 ดูรายงาน</button>
+      </div>
+
+      <!-- Card 3: ดูร���ยงานรวม (Admin) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">⚙️</div>
+          <h3 class="card-title">ส่วนผู้ดูแลระบบ</h3>
+        </div>
+        <p class="card-description">จัดการข้อมูล สร้างรายงาน PDF และส่งรายงาน Telegram</p>
+        <button class="btn btn-primary" onclick="showAdminPanel()" id="adminPanelBtn" style="display:none">🛠️ ผู้ดูแลระบบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODALS ============ -->
+
+  <!-- Modal 1: บันทึกการมาสาย -->
+  <div id="attendanceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📝 บันทึกการมาสาย</h2>
+        <span class="close" onclick="closeModal('attendanceModal')">&times;</span>
+      </div>
+
+      <div class="error-message" id="attendanceError"></div>
+      <div class="success-message" id="attendanceSuccess"></div>
+
+      <form id="attendanceForm" onsubmit="submitAttendance(event)">
+        <!-- ชั้นเรียน -->
+        <div class="form-group">
+          <label class="form-label">ชั้นเรียน</label>
+          <select class="form-control" id="classSelect" onchange="updateStudentList()" required>
+            <option value="">-- เลือกชั้นเรียน --</option>
+          </select>
+        </div>
+
+        <!-- ชื่อ-สกุล -->
+        <div class="form-group">
+          <label class="form-label">ชื่อ-สกุล</label>
+          <select class="form-control" id="studentSelect" required>
+            <option value="">-- เลือกนักเรียน --</option>
+          </select>
+        </div>
+
+        <!-- วันที่ -->
+        <div class="form-group">
+          <label class="form-label">วันที่</label>
+          <input type="date" class="form-control" id="attendanceDate" required>
+        </div>
+
+        <!-- เวลา -->
+        <div class="form-group">
+          <label class="form-label">เวลา</label>
+          <input type="time" class="form-control" id="attendanceTime" required>
+        </div>
+
+        <!-- สาเหตุ -->
+        <div class="form-group">
+          <label class="form-label">สาเหตุ</label>
+          <select class="form-control" id="reasonSelect" onchange="handleReasonChange()" required>
+            <option value="">-- เลือกสาเหตุ --</option>
+          </select>
+        </div>
+
+        <!-- หมายเหตุเพิ่มเติม (ถ้าเลือก "อื่น ๆ") -->
+        <div class="form-group" id="additionalNoteGroup" style="display:none;">
+          <label class="form-label">หมายเหตุเพิ่มเติม</label>
+          <input type="text" class="form-control" id="additionalNote" placeholder="โปรดระบุ">
+        </div>
+
+        <!-- อัปโหลดรูปภาพ -->
+        <div class="form-group">
+          <label class="form-label">รูปภาพหลักฐาน</label>
+          <div class="file-upload">
+            <input type="file" id="imageFile" accept="image/*" onchange="previewImage()">
+            <label class="file-upload-label" for="imageFile">
+              <span>📷 คลิกเพื่ออัปโหลดรูปภาพ หรือถ่ายภาพจากกล้อง</span>
+            </label>
+          </div>
+          <div class="file-preview" id="imagePreview"></div>
+        </div>
+
+        <!-- ผู้บันทึก -->
+        <div class="form-group">
+          <label class="form-label">ผู้บันทึก</label>
+          <select class="form-control" id="recorderSelect" required>
+            <option value="">-- เลือกผู้บันทึก --</option>
+          </select>
+        </div>
+
+        <!-- ปุ่มบันทึก -->
+        <button type="submit" class="btn btn-primary" style="margin-top: 20px;">✅ บันทึกข้อมูล</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: ดูรายงานรายวัน -->
+  <div id="dailyReportModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📊 ดูรายงานรายวัน</h2>
+        <span class="close" onclick="closeModal('dailyReportModal')">&times;</span>
+      </div>
+
+      <div class="filter-group">
+        <input type="date" class="form-control" id="reportDate">
+        <select class="form-control" id="reportClassFilter">
+          <option value="">-- ทั้งหมด --</option>
+        </select>
+        <button class="btn btn-secondary" onclick="loadDailyReport()">🔍 ค้นหา</button>
+      </div>
+
+      <div class="summary-card" id="dailyReportSummary"></div>
+
+      <div class="loading" id="reportLoading">
+        <div class="spinner"></div>
+        <p>กำลังโหลดข้อมูล...</p>
+      </div>
+
+      <table id="dailyReportTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>ชั้นเรียน</th>
+            <th>ชื่อ-สกุล</th>
+            <th>เวลา</th>
+            <th>สาเหตุ</th>
+            <th>รูปภาพ</th>
+          </tr>
+        </thead>
+        <tbody id="dailyReportBody"></tbody>
+      </table>
+
+      <div class="export-buttons" style="margin-top: 20px;">
+        <button class="btn-export" onclick="exportToPDF('daily')">📄 พิมพ์ PDF</button>
+        <button class="btn-export" onclick="sendToTelegram()">📢 ส่ง Telegram</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Admin Panel -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛠️ ส่วนผู้ดูแลระบบ</h2>
+        <span class="close" onclick="closeModal('adminModal')">&times;</span>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchAdminTab('search')">🔍 ค้นหา/แก้ไข</button>
+        <button class="tab-btn" onclick="switchAdminTab('report')">📈 สรุปรายงาน</button>
+        <button class="tab-btn" onclick="switchAdminTab('settings')">⚙️ ตั้งค่า</button>
+      </div>
+
+      <!-- Tab 1: Search/Edit -->
+      <div id="searchTab" class="tab-content active">
+        <div class="search-box">
+          <input type="text" class="form-control" id="searchInput" placeholder="ค้นหาชื่อนักเรียน, ชั้นเรียน, สาเหตุ...">
+          <button class="btn btn-secondary" onclick="searchAdminRecords()">ค้นหา</button>
+        </div>
+
+        <div class="loading" id="searchLoading">
+          <div class="spinner"></div>
+        </div>
+
+        <table id="searchResultTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>ชั้นเรียน</th>
+              <th>ชื่อ-สกุล</th>
+              <th>เวลา</th>
+              <th>สาเหตุ</th>
+              <th>การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="searchResultBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab 2: Report -->
+      <div id="reportTab" class="tab-content">
+        <div class="summary-card" id="adminSummary"></div>
+
+        <div class="filter-group">
+          <input type="month" class="form-control" id="reportMonth">
+          <select class="form-control" id="reportTypeSelect">
+            <option value="daily">รายวัน</option>
+            <option value="monthly">รายเดือน</option>
+            <option value="individual">รายบุคคล</option>
+            <option value="all">สรุปทั้งหมด</option>
+          </select>
+          <button class="btn btn-primary" onclick="generateReport()">📊 สร้างรายงาน</button>
+        </div>
+
+        <div id="reportContent"></div>
+      </div>
+
+      <!-- Tab 3: Settings -->
+      <div id="settingsTab" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">Google Sheet ID</label>
+          <input type="text" class="form-control" value="1xRibo2wYV4EyN_FR6cRnXk-tIUvAn6gK-yOkBx41HPc" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Google Drive Folder ID</label>
+          <input type="text" class="form-control" value="1bRh-AMIzc56dU_tKfD6NoefPUw9MlkUq" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Telegram Token</label>
+          <input type="password" class="form-control" value="8040742079:AAHz1I5a9Bi2QbiFXnaRMGGl5Yro8dqD2k8" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Telegram Chat ID</label>
+          <input type="text" class="form-control" value="-4689717366" readonly>
+        </div>
+
+        <button class="btn btn-primary" onclick="initializeData()">🔄 เริ่มต้นข้อมูลใหม่</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Admin Login -->
+  <div id="adminLoginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>🔐 เข้าสู่ระบบ Admin</h2>
+        <span class="close" onclick="closeModal('adminLoginModal')">&times;</span>
+      </div>
+
+      <div class="error-message" id="adminLoginError"></div>
+
+      <form onsubmit="verifyAdmin(event)">
+        <div class="form-group">
+          <label class="form-label">ชื่อผู้ใช้</label>
+          <input type="text" class="form-control" id="adminUsername" placeholder="admin" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">รหัสผ่าน</label>
+          <input type="password" class="form-control" id="adminPassword" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">🚀 เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRPkIfa3KbPq-S6SFSHt7x9Y0n9sk36aS4BhQtQ78MMKD0ndNcvu7aseyAM0bPPmnU/exec";
+    let isAdmin = false;
+    let dropdownData = {};
+
+    // ============ INITIALIZE ============
+    document.addEventListener('DOMContentLoaded', function() {
+      // ตั้งค่าวันที่ปัจจุบัน
+      document.getElementById('attendanceDate').valueAsDate = new Date();
+      document.getElementById('attendanceTime').value = new Date().toTimeString().slice(0, 5);
+      document.getElementById('reportDate').valueAsDate = new Date();
+
+      // ดึงข้อมูล Dropdown
+      loadDropdownData();
+    });
+
+    // ============ DROPDOWN DATA ============
+    function loadDropdownData() {
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'getDropdownData'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        dropdownData = data;
+        populateDropdowns();
+        console.log('Dropdown data loaded:', data);
+      })
+      .catch(err => console.error('Error loading dropdown:', err));
+    }
+
+    function populateDropdowns() {
+      // ชั้นเรียน
+      const classSelect = document.getElementById('classSelect');
+      const reportClassFilter = document.getElementById('reportClassFilter');
+      dropdownData.classes.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.text = cls;
+        classSelect.appendChild(option);
+
+        const option2 = document.createElement('option');
+        option2.value = cls;
+        option2.text = cls;
+        reportClassFilter.appendChild(option2);
+      });
+
+      // สาเหตุ
+      const reasonSelect = document.getElementById('reasonSelect');
+      dropdownData.reasons.forEach(reason => {
+        const option = document.createElement('option');
+        option.value = reason;
+        option.text = reason;
+        reasonSelect.appendChild(option);
+      });
+
+      // ผู้บันทึก
+      const recorderSelect = document.getElementById('recorderSelect');
+      dropdownData.recorders.forEach(recorder => {
+        const option = document.createElement('option');
+        option.value = recorder;
+        option.text = recorder;
+        recorderSelect.appendChild(option);
+      });
+
+      updateStudentList();
+    }
+
+    function updateStudentList() {
+      const classLevel = document.getElementById('classSelect').value;
+      const studentSelect = document.getElementById('studentSelect');
+      
+      // เคลียร์ตัวเลือก
+      studentSelect.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+      
+      if (classLevel && dropdownData.students[classLevel]) {
+        dropdownData.students[classLevel].forEach(student => {
+          const option = document.createElement('option');
+          option.value = student;
+          option.text = student;
+          studentSelect.appendChild(option);
+        });
+      }
+    }
+
+    function handleReasonChange() {
+      const reason = document.getElementById('reasonSelect').value;
+      const additionalNoteGroup = document.getElementById('additionalNoteGroup');
+      
+      if (reason === 'อื่น ๆ') {
+        additionalNoteGroup.style.display = 'block';
+      } else {
+        additionalNoteGroup.style.display = 'none';
+      }
+    }
+
+    // ============ MODAL CONTROL ============
+    function openAttendanceModal() {
+      document.getElementById('attendanceModal').style.display = 'block';
+    }
+
+    function openDailyReportModal() {
+      document.getElementById('dailyReportModal').style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    }
+
+    // ============ FILE UPLOAD ============
+    function previewImage() {
+      const file = document.getElementById('imageFile').files[0];
+      const preview = document.getElementById('imagePreview');
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // ============ SUBMIT ATTENDANCE ============
+    function submitAttendance(event) {
+      event.preventDefault();
+
+      const formData = {
+        action: 'saveAttendance',
+        date: document.getElementById('attendanceDate').value,
+        class: document.getElementById('classSelect').value,
+        studentName: document.getElementById('studentSelect').value,
+        time: document.getElementById('attendanceTime').value,
+        reason: document.getElementById('reasonSelect').value,
+        additionalNote: document.getElementById('additionalNote').value,
+        recorder: document.getElementById('recorderSelect').value,
+        fileName: ''
+      };
+
+      // อัปโหลดรูปภาพ
+      const file = document.getElementById('imageFile').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          formData.fileData = e.target.result.split(',')[1];
+          formData.fileName = file.name;
+          sendAttendanceData(formData);
+        }
+        reader.readAsDataURL(file);
+      } else {
+        sendAttendanceData(formData);
+      }
+    }
+
+    function sendAttendanceData(formData) {
+      const params = new URLSearchParams(formData);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('attendanceSuccess').textContent = '✅ ' + data.message;
+          document.getElementById('attendanceSuccess').style.display = 'block';
+          document.getElementById('attendanceForm').reset();
+          document.getElementById('imagePreview').innerHTML = '';
+          
+          setTimeout(() => {
+            closeModal('attendanceModal');
+            document.getElementById('attendanceSuccess').style.display = 'none';
+          }, 2000);
+        } else {
+          showError('attendanceError', data.message);
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        showError('attendanceError', 'เกิดข้อผิดพลาด: ' + err.message);
+      });
+    }
+
+    // ============ DAILY REPORT ============
+    function loadDailyReport() {
+      const date = document.getElementById('reportDate').value;
+      const classFilter = document.getElementById('reportClassFilter').value;
+
+      document.getElementById('reportLoading').style.display = 'block';
+      document.getElementById('dailyReportTable').style.display = 'none';
+
+      const params = new URLSearchParams({
+        action: 'getReportData',
+        date: date,
+        class: classFilter
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('reportLoading').style.display = 'none';
+        
+        if (data.success) {
+          displayDailyReport(data.data, data.summary);
+        }
+      })
+      .catch(err => console.error('Error:', err));
+    }
+
+    function displayDailyReport(records, summary) {
+      // สรุป
+      const summaryHtml = Object.entries(summary.byClass)
+        .map(([cls, count]) => `
+          <div class="summary-item">
+            <div class="summary-item-value">${count}</div>
+            <div class="summary-item-label">ชั้น ${cls}</div>
+          </div>
+        `).join('');
+      
+      document.getElementById('dailyReportSummary').innerHTML = summaryHtml;
+
+      // ตาราง
+      const tableBody = document.getElementById('dailyReportBody');
+      tableBody.innerHTML = records.map(record => `
+        <tr>
+          <td>${record.date}</td>
+          <td><span class="badge badge-primary">${record.class}</span></td>
+          <td>${record.name}</td>
+          <td>${record.time}</td>
+          <td>${record.reason}</td>
+          <td>${record.imageUrl ? `<a href="${record.imageUrl}" target="_blank">📷 ดู</a>` : '-'}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('dailyReportTable').style.display = 'table';
+    }
+
+    // ============ ADMIN FUNCTIONS ============
+    function showAdminLogin() {
+      document.getElementById('adminLoginModal').style.display = 'block';
+    }
+
+    function showAdminPanel() {
+      if (isAdmin) {
+        document.getElementById('adminModal').style.display = 'block';
+        loadAdminData();
+      }
+    }
+
+    function verifyAdmin(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('adminUsername').value;
+      const password = document.getElementById('adminPassword').value;
+
+      const params = new URLSearchParams({
+        action: 'verifyAdmin',
+        username: username,
+        password: password
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.isAdmin) {
+          isAdmin = true;
+          document.getElementById('adminPanelBtn').style.display = 'inline-block';
+          document.getElementById('logoutBtn').style.display = 'inline-block';
+          closeModal('adminLoginModal');
+          showAdminPanel();
+        } else {
+          showError('adminLoginError', data.message);
+        }
+      });
+    }
+
+    function logout() {
+      isAdmin = false;
+      document.getElementById('adminPanelBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      closeModal('adminModal');
+    }
+
+    function switchAdminTab(tab) {
+      // ซ่อนแท็บทั้งหมด
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      // แสดงแท็บที่เลือก
+      document.getElementById(tab + 'Tab').classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function searchAdminRecords() {
+      const searchTerm = document.getElementById('searchInput').value;
+      document.getElementById('searchLoading').style.display = 'block';
+      document.getElementById('searchResultTable').style.display = 'none';
+
+      const params = new URLSearchParams({
+        action: 'searchRecords',
+        searchTerm: searchTerm
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('searchLoading').style.display = 'none';
+        
+        if (data.success) {
+          displaySearchResults(data.data);
+        }
+      });
+    }
+
+    function displaySearchResults(records) {
+      const tableBody = document.getElementById('searchResultBody');
+      tableBody.innerHTML = records.map(record => `
+        <tr>
+          <td>${record.date}</td>
+          <td>${record.class}</td>
+          <td>${record.name}</td>
+          <td>${record.time}</td>
+          <td>${record.reason}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-small btn-edit" onclick="editRecord(${record.rowIndex})">แก้ไข</button>
+              <button class="btn-small btn-delete" onclick="deleteRecordConfirm(${record.rowIndex})">ลบ</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      document.getElementById('searchResultTable').style.display = 'table';
+    }
+
+    function deleteRecordConfirm(rowIndex) {
+      if (confirm('ยืนยันการลบข้อมูลนี้?')) {
+        deleteRecord(rowIndex);
+      }
+    }
+
+    function deleteRecord(rowIndex) {
+      const params = new URLSearchParams({
+        action: 'deleteRecord',
+        rowIndex: rowIndex
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('ลบข้อมูลเรียบร้อยแล้ว');
+          searchAdminRecords();
+        }
+      });
+    }
+
+    function loadAdminData() {
+      loadDailyReport();
+    }
+
+    function generateReport() {
+      const reportType = document.getElementById('reportTypeSelect').value;
+      const month = document.getElementById('reportMonth').value;
+
+      const params = new URLSearchParams({
+        action: 'getPdfReport',
+        reportType: reportType,
+        date: month
+      });
+
+      window.open(SCRIPT_URL + '?' + params.toString());
+    }
+
+    function sendToTelegram() {
+      const date = document.getElementById('reportDate').value;
+      const records = document.querySelectorAll('#dailyReportBody tr');
+      
+      let reportText = `
+📅 วันที่: ${date}
+📊 จำนวนผู้มาสาย: ${records.length} คน\n`;
+
+      records.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        reportText += `\n✓ ชั้น ${cells[1].innerText} - ${cells[2].innerText}`;
+      });
+
+      const params = new URLSearchParams({
+        action: 'sendTelegramReport',
+        reportText: reportText,
+        date: date
+      });
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: params
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('✅ ส่งรายงานไปยัง Telegram แล้ว');
+        }
+      });
+    }
+
+    function exportToPDF(type) {
+      const params = new URLSearchParams({
+        action: 'getPdfReport',
+        reportType: type,
+        date: document.getElementById('reportDate').value
+      });
+
+      window.open(SCRIPT_URL + '?' + params.toString());
+    }
+
+    function initializeData() {
+      if (confirm('ยืนยันการสร้างชีตใหม่? (จะไม่ลบข้อมูลเดิม)')) {
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'initializeSheets'
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          location.reload();
+        });
+      }
+    }
+
+    // ============ UTILITY FUNCTIONS ============
+    function showError(elementId, message) {
+      const element = document.getElementById(elementId);
+      element.textContent = '❌ ' + message;
+      element.style.display = 'block';
+      setTimeout(() => {
+        element.style.display = 'none';
+      }, 5000);
+    }
+
+    function editRecord(rowIndex) {
+      alert('ฟังก์ชันแก้ไขกำลังพัฒนา');
+    }
+  </script>
+</body>
+</html>
